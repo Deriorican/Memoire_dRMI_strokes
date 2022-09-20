@@ -1,0 +1,35 @@
+This document provides a map of the organisation of this git repository.
+
+All repositories and files :
+  
+  TheoreticalRessources - Contains all the ressources used to better understand the main concepts adressed during this thesis.
+  
+    -
+    
+    -
+    
+    -
+    
+  Data - Contains all data studied during this thesis
+  
+    -
+    
+    -
+    
+    -
+  
+  Analysis - Raw and more raffined results of the study
+  
+    -
+    
+    -
+    
+    -
+  
+  Codes - All codes written during the thesis
+  
+    -
+    
+    -
+    
+    -
