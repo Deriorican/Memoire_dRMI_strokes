@@ -1,0 +1,7 @@
+py analysis_fixedPatient.py "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study" "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\Atlas_Maps" 12 "xtract_prob_Corticospinal_Tract_L" "xtract_prob_Corticospinal_Tract_R" "xtract_prob_Frontal_Aslant_Tract_L" "xtract_prob_Frontal_Aslant_Tract_R" "xtract_prob_Superior_Longitudinal_Fasciculus_1_L" "xtract_prob_Superior_Longitudinal_Fasciculus_2_L" "xtract_prob_Superior_Longitudinal_Fasciculus_1_R" "xtract_prob_Superior_Longitudinal_Fasciculus_2_R" "xtract_prob_Superior_Longitudinal_Fasciculus_3_L" "xtract_prob_Superior_Longitudinal_Fasciculus_3_R" "xtract_prob_Superior_Thalamic_Radiation_L" "xtract_prob_Superior_Thalamic_Radiation_R" 4 "20_01_01_E0" "20_01_01_E1" "20_01_01_E2" "20_11_02_E1"
+
+py analysis_fixedPatient.py "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study" "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\Atlas_Maps" 2 "Cortico_Ponto_Cerebellum_Left" "Cortico_Ponto_Cerebellum_Right" 4 "20_01_01_E0" "20_01_01_E1" "20_01_01_E2" "20_11_02_E1"
+
+py analysis_fixedPatient.py "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study" "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\Atlas_Maps" 2 "mni_prob_Frontal_Lobe" "mni_prob_Parietal_Lobe" 4 "20_01_01_E0" "20_01_01_E1" "20_01_01_E2" "20_11_02_E1"
+
+py analysis_fixedPatient.py "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study" "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\Atlas_Maps" 2 "harvardoxford-subcortical_prob_Right_Thalamus" "harvardoxford-subcortical_prob_Left_Thalamus" 4 "20_01_01_E0" "20_01_01_E1" "20_01_01_E2" "20_11_02_E1"
