@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
-from scipy.signal import savgol_filter
 from os.path import join as pjoin
+from os.path import exists
+from os import makedirs
 import numpy as np
 from dipy.viz import regtools
 from dipy.data import fetch_stanford_hardi
@@ -40,6 +41,8 @@ def getHisto(study_path, patient, image_type, mask_path, mask_type, nBins):
     histoPoints = np.array(histoPoints)
     save_file = pjoin(study_path, patient, "histograms", patient + "_" + image_type + "_" + mask_type + "_histo" + ".csv")
     bins_file = pjoin(study_path, patient, "histograms", patient + "_" + image_type + "_" + mask_type + "_bins" + ".csv")
+    if not exists(pjoin(study_path, patient, "histograms")):
+        makedirs(pjoin(study_path, patient, "histograms"))
     with open(save_file, 'w') as my_file:
         np.savetxt(my_file, histoPoints)
     with open(bins_file, 'w') as my_file:
@@ -71,11 +74,9 @@ def compareHisto(bins, histos, labels, ncols, titles):
         if ncols != 1:
             a = i // (n_histos // ncols)
             axs[a].bar(bins[i][:-1], histos[i], width=bins[i][1]-bins[i][0], align="edge", alpha = 1 / n_histos * ncols, label=labels[i])
-            #axs[a].plot(bins[i][:-1], savgol_filter(histos[i], len(bins[i]) - 1, 20)) 
             axs[a].legend()
         else:
             axs.bar(bins[i][:-1], histos[i], width=bins[i][1]-bins[i][0], align="edge", alpha = 1 / n_histos * ncols, label=labels[i])
-            #axs.plot(bins[i][:-1], savgol_filter(histos[i], len(bins[i]) - 1, 20)) 
             axs.legend()
     for i in range(len(titles)):
         if ncols != 1:
@@ -99,61 +100,3 @@ def getCommonMask(study_path, patient_list):
     to_save[common_mask] = 1
     save_nifti(pjoin(study_path, "common_mask.nii.gz"), to_save, np.eye(4))
     return to_save
-
-
-
-if False:
-    study_path = "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study"
-    patient_list = ["20_01_01_E0", "20_01_01_E1", "20_01_01_E2", "20_11_02_E1"]
-    getCommonMask(study_path, patient_list)
-
-if False:
-    study_path = "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study"
-    patient_list = ["20_01_01_E0", "20_01_01_E1", "20_01_01_E2", "20_11_02_E1"]
-    image_path_list = ["AD", "FA", "MD", "RD"]
-    mask_path = "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\Atlas_Maps\\XTRACT"
-    mask_type_list = ["xtract_prob_Corticospinal_Tract_L", "xtract_prob_Corticospinal_Tract_R"]
-
-    bins, Histos = getHistoMultiplePatientsImagesMasks(study_path, patient_list, image_path_list, mask_path, mask_type_list, 100)
-
-if True:
-    histo1 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\histograms\\20_01_01_E0_FA_xtract_prob_Corticospinal_Tract_L_histo.csv")
-    histo2 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E1\\histograms\\20_01_01_E1_FA_xtract_prob_Corticospinal_Tract_L_histo.csv")
-    histo3 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E2\\histograms\\20_01_01_E2_FA_xtract_prob_Corticospinal_Tract_L_histo.csv")
-    
-    histo4 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\histograms\\20_01_01_E0_AD_xtract_prob_Corticospinal_Tract_L_histo.csv")
-    histo5 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E1\\histograms\\20_01_01_E1_AD_xtract_prob_Corticospinal_Tract_L_histo.csv")
-    histo6 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E2\\histograms\\20_01_01_E2_AD_xtract_prob_Corticospinal_Tract_L_histo.csv")
-
-    histo7 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\histograms\\20_01_01_E0_RD_xtract_prob_Corticospinal_Tract_L_histo.csv")
-    histo8 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E1\\histograms\\20_01_01_E1_RD_xtract_prob_Corticospinal_Tract_L_histo.csv")
-    histo9 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E2\\histograms\\20_01_01_E2_RD_xtract_prob_Corticospinal_Tract_L_histo.csv")
-    
-    histo10 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\histograms\\20_01_01_E0_MD_xtract_prob_Corticospinal_Tract_L_histo.csv")
-    histo11 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E1\\histograms\\20_01_01_E1_MD_xtract_prob_Corticospinal_Tract_L_histo.csv")
-    histo12 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E2\\histograms\\20_01_01_E2_MD_xtract_prob_Corticospinal_Tract_L_histo.csv")
-
-
-    histos = [histo1, histo2, histo3, histo4, histo5, histo6, histo7, histo8, histo9, histo10, histo11, histo12]
-
-    bins1 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\histograms\\20_01_01_E0_FA_xtract_prob_Corticospinal_Tract_L_bins.csv")
-    bins2 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E1\\histograms\\20_01_01_E1_FA_xtract_prob_Corticospinal_Tract_L_bins.csv")
-    bins3 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E2\\histograms\\20_01_01_E2_FA_xtract_prob_Corticospinal_Tract_L_bins.csv")
-    
-    bins4 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\histograms\\20_01_01_E0_AD_xtract_prob_Corticospinal_Tract_L_bins.csv")
-    bins5 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E1\\histograms\\20_01_01_E1_AD_xtract_prob_Corticospinal_Tract_L_bins.csv")
-    bins6 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E2\\histograms\\20_01_01_E2_AD_xtract_prob_Corticospinal_Tract_L_bins.csv")
-
-    bins7 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\histograms\\20_01_01_E0_RD_xtract_prob_Corticospinal_Tract_L_bins.csv")
-    bins8 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E1\\histograms\\20_01_01_E1_RD_xtract_prob_Corticospinal_Tract_L_bins.csv")
-    bins9 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E2\\histograms\\20_01_01_E2_RD_xtract_prob_Corticospinal_Tract_L_bins.csv")
-
-    bins10 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\histograms\\20_01_01_E0_MD_xtract_prob_Corticospinal_Tract_L_bins.csv")
-    bins11 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E1\\histograms\\20_01_01_E1_MD_xtract_prob_Corticospinal_Tract_L_bins.csv")
-    bins12 = np.loadtxt("C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E2\\histograms\\20_01_01_E2_MD_xtract_prob_Corticospinal_Tract_L_bins.csv")
-
-    bins = [bins1, bins2, bins3, bins4, bins5, bins6, bins7, bins8, bins9, bins10, bins11, bins12]
-
-    labels = ["20_01_01_E0", "20_01_01_E1", "20_01_01_E2", "20_01_01_E0", "20_01_01_E1", "20_01_01_E2", "20_01_01_E0", "20_01_01_E1", "20_01_01_E2", "20_01_01_E0", "20_01_01_E1", "20_01_01_E2"]
-    titles = ["FA", "AD", "RD", "MD"]
-    compareHisto(bins, histos, labels, 4, titles)

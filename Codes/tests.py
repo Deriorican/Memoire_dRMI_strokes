@@ -1,33 +1,56 @@
-from os.path import join as pjoin
 import numpy as np
-from dipy.io.image import load_nifti, save_nifti
+import matplotlib.pyplot as plt
 
-import nibabel as nib
+def evaluateNGauss(x, gauss):
+    if type(x) == np.ndarray:
+        value = np.zeros(x.shape)
+    else:
+        value = 0
+    for (A, mu, sigma) in gauss:
+        value += A * np.exp(- (1 / 2) * ((x - mu) / sigma)**2)
+    return value
 
-path_to_patients = "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study"
-patient = "20_01_01_E0"
-sub_folder = "microstructure\\diamond"
-file_type =  "20_01_01_E0_diamond_fractions.nii.gz"
-test_file = pjoin(path_to_patients, patient, sub_folder, file_type)
+def fitNGauss(bins, histo, NGauss):
+    ratio = 1.65
+    xs = bins[:-1] + (bins[1]-bins[0])/2
+    mus = np.linspace(xs[0], xs[-1], num=NGauss)
+    if NGauss > 1:
+        s = (mus[1] - mus[0]) / (2 * np.sqrt(2 * np.log(ratio)))
+    else:
+        sigmas = (xs[-1] - xs[0])/2
+    B = np.zeros(NGauss)
+    M = np.zeros((NGauss, NGauss))
+    for a in range(NGauss):
+        B[a] = np.sum(histo * np.exp(-1/2 * ((xs - mus[a]) / s) ** 2))
+        for i in range(NGauss):
+            M[a, i] = np.sum(np.exp(-1/2 * ((xs - mus[i]) / s) ** 2) * np.exp(-1/2 * ((xs - mus[a]) / s) ** 2))
 
-other_sub_folder = "microstructure\\dti"
-other_file_type = "20_01_01_E0_FA.nii.gz"
-other_test_file = pjoin(path_to_patients, patient, other_sub_folder, other_file_type)
-
-ref_file = "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\Atlas_Maps\\FSL_HCP1065_FA_1mm.nii.gz"
-
-"""ref_data, ref_affine, ref_image = load_nifti(ref_file, return_img=True)
-test_data, test_affine, test_image = load_nifti(test_file, return_img=True)
-other_test_data, other_test_affine, other_test_image = load_nifti(other_test_file, return_img=True)
+    As = np.linalg.solve(M, B)
+    gauss = []
+    for i in range(NGauss):
+        gauss.append((As[i], mus[i], s))
+    return gauss
 
 
-print(other_test_data.shape)
-print(test_data.shape)
-print(ref_data.shape)"""
+def fitNGaussFromPath(bins_path, histo_path, NGauss):
 
-final_file = "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\transformed\\20_01_01_E0_diamond_fractions_transformed.nii.gz"
-final_image = nib.load(final_file)
-test_image = nib.load(test_file)
-print(test_image)
-print("==============================")
-print(final_image)
+    histo = np.loadtxt(histo_path)
+    bins = np.loadtxt(bins_path)
+
+    return fitNGauss(bins, histo, NGauss), bins, histo
+
+bins_path = "C:\\Users\\Louis Lovat\\Desktop\\Memoire_dRMI_strokes\\TestStudy\\20_01_01_E0\\histograms\\20_01_01_E0_FA_xtract_prob_Corticospinal_Tract_L_bins.csv"
+histo_path = "C:\\Users\\Louis Lovat\\Desktop\\Memoire_dRMI_strokes\\TestStudy\\20_01_01_E0\\histograms\\20_01_01_E0_FA_xtract_prob_Corticospinal_Tract_L_histo.csv"
+
+gauss, bins, histo = fitNGaussFromPath(bins_path, histo_path, 15)
+print(gauss)
+XS = np.linspace(bins[0], bins[-1], 400)
+G = evaluateNGauss(XS, gauss)
+
+plt.bar(bins[:-1], histo, width=bins[1]-bins[0], align="edge", alpha=1/3, label="real")
+plt.plot(XS, G, label="approx")
+plt.legend()
+plt.show()
+
+
+

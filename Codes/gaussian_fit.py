@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from os.path import join as pjoin
-from scipy.optimize import minimize
-from scipy.optimize import LinearConstraint
+import sys
 
 def evaluateNGauss(x, gauss):
     if type(x) == np.ndarray:
@@ -14,38 +13,25 @@ def evaluateNGauss(x, gauss):
     return value
 
 
-def objective_function(As, mus, sigmas, xs, histo):
-    gauss = []
-    for A, mu, sigma in zip(As, mus, sigmas):
-        gauss.append((A, mu, sigma))
-    gaussEval = evaluateNGauss(xs, gauss)
-    RMSE = (np.sum((histo - gaussEval)**2) / len(xs))**(1/2)
-    return RMSE
-
-
-
-def fitNGauss(bins, histo, NGauss, init=None):
+def fitNGauss(bins, histo, NGauss):
+    ratio = 1.65
     xs = bins[:-1] + (bins[1]-bins[0])/2
-    if init is None:
-        mus = np.linspace(xs[0], xs[-1], num=NGauss)
-        As = np.ones(NGauss) * np.mean(histo)
-        if NGauss > 1:
-            sigmas = np.ones(NGauss) * (mus[1] - mus[0]) / (2 * np.sqrt(2 * np.log(2)))
-        else:
-            sigmas = [(xs[-1] - xs[0])/2]
+    mus = np.linspace(xs[0], xs[-1], num=NGauss)
+    if NGauss > 1:
+        s = (mus[1] - mus[0]) / (2 * np.sqrt(2 * np.log(ratio)))
     else:
-        As = init[0]
-        mus = init[1]
-        sigmas = init[2]
-    mat = np.eye(len(As))
-    ub = np.inf
-    lb = 0
-    cons = LinearConstraint(mat, lb, ub)
-    res = minimize(objective_function, As, args=(mus, sigmas, xs, histo), constraints=cons)
-    print(res.success)
+        sigmas = (xs[-1] - xs[0])/2
+    B = np.zeros(NGauss)
+    M = np.zeros((NGauss, NGauss))
+    for a in range(NGauss):
+        B[a] = np.sum(histo * np.exp(-1/2 * ((xs - mus[a]) / s) ** 2))
+        for i in range(NGauss):
+            M[a, i] = np.sum(np.exp(-1/2 * ((xs - mus[i]) / s) ** 2) * np.exp(-1/2 * ((xs - mus[a]) / s) ** 2))
+
+    As = np.linalg.solve(M, B)
     gauss = []
-    for A, mu, sigma in zip(res.x, mus, sigmas):
-        gauss.append((A, mu, sigma))
+    for i in range(NGauss):
+        gauss.append((As[i], mus[i], s))
     return gauss
 
 
@@ -65,17 +51,17 @@ def displayGaussianApprox(gauss, bins, histo, label="", title=""):
     plt.show()
 
 
-def fitNGaussFromPath(bins_path, histo_path, NGauss, init=None):
+def fitNGaussFromPath(bins_path, histo_path, NGauss):
 
     histo = np.loadtxt(histo_path)
     bins = np.loadtxt(bins_path)
 
-    return fitNGauss(bins, histo, NGauss, init=init), bins, histo
+    return fitNGauss(bins, histo, NGauss), bins, histo
 
 
 def main():
-    bins_path = "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\histograms\\20_01_01_E0_RD_xtract_prob_Corticospinal_Tract_L_bins.csv"
-    histo_path = "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study\\20_01_01_E0\\histograms\\20_01_01_E0_RD_xtract_prob_Corticospinal_Tract_L_histo.csv"
+    bins_path = "C:\\Users\\Louis Lovat\\Desktop\\Memoire_dRMI_strokes\\TestStudy\\20_01_01_E0\\histograms\\20_01_01_E0_FA_xtract_prob_Corticospinal_Tract_L_bins.csv"
+    histo_path = "C:\\Users\\Louis Lovat\\Desktop\\Memoire_dRMI_strokes\\TestStudy\\20_01_01_E0\\histograms\\20_01_01_E0_FA_xtract_prob_Corticospinal_Tract_L_histo.csv"
 
     gauss, bins, histo = fitNGaussFromPath(bins_path, histo_path, 20)
     print(gauss)

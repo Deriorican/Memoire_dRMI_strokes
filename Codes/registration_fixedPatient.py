@@ -1,4 +1,6 @@
 from os.path import join as pjoin
+from os.path import exists
+from os import makedirs
 import numpy as np
 from dipy.viz import regtools
 from dipy.data import fetch_stanford_hardi
@@ -132,6 +134,8 @@ def getMapping_MultiplePatients(atlas_ref_path, study_path, patient_list, sub_fo
 def transformFile(path_to_file, file_to_transform, study_path, patient, mapping=None, specified_save=None, isMask=False):
     suffixe = ".nii.gz"
     complete_path_to_file = pjoin(path_to_file, file_to_transform + suffixe)
+    if not exists(pjoin(study_path, patient, "transformed")):
+        makedirs(pjoin(study_path, patient, "transformed"))
     if specified_save is None:
         save_path = pjoin(study_path, patient, "transformed", patient + "_" + file_to_transform + suffixe)
     else:
@@ -186,6 +190,8 @@ def qualityCheck(study_path, patient, sub_folder, patient_ref, atlas_ref):
     patient_ref_path = pjoin(study_path, patient, sub_folder, patient + patient_ref + suffixe)
     atlas_ref_path = pjoin(study_path, patient, "transformed", patient + "_" + atlas_ref)
     save_root = pjoin(study_path, patient, "transformed", "QC", patient + "_qc")
+    if not exists(pjoin(study_path, patient, "transformed", "QC")):
+        makedirs(pjoin(study_path, patient, "transformed", "QC"))
 
     atlasReference, atlasReference_affine = load_nifti(atlas_ref_path)
     patientReference, patientReference_affine= load_nifti(patient_ref_path)

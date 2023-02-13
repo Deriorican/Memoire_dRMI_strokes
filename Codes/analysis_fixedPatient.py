@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
 from os.path import join as pjoin
+from os.path import exists
+from os import makedirs
 import numpy as np
 from dipy.viz import regtools
 from dipy.data import fetch_stanford_hardi
@@ -41,6 +43,8 @@ def applyCommonMask(study_path, patient_list):
 
 def getHistogram(study_path, patient, sub_folder, metric, mask, nBins=100):
     suffixe = ".nii.gz"
+    if not exists(pjoin(study_path, patient, "transformed")):
+        makedirs(pjoin(study_path, patient, "transformed"))
     image_path = pjoin(study_path, patient, sub_folder, patient + "_" + metric + suffixe)
     mask_path = pjoin(study_path, patient, "transformed", patient + "_" + mask + suffixe)
     common_mask_path = pjoin(study_path, patient, patient + "_common_mask" + suffixe)
@@ -130,7 +134,7 @@ def main(args):
 
 
 # Command : 
-# py analysis_fixedPatient.py "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\study" "C:\\Users\\Louis Lovat\\Desktop\\Memoire\\Atlas_Maps" 1 "FSL_HCP1065_FA_1mm" 4 "20_01_01_E0" "20_01_01_E1" "20_01_01_E2" "20_11_02_E1"
+# py analysis_fixedPatient.py "C:\\Users\\Louis Lovat\\Desktop\\Memoire_dRMI_strokes\\study" "C:\\Users\\Louis Lovat\\Desktop\\Memoire_dRMI_strokes\\Atlas_Maps" 1 "FSL_HCP1065_FA_1mm" 4 "20_01_01_E0" "20_01_01_E1" "20_01_01_E2" "20_11_02_E1"
 
 # XTRACT (12)
 # "xtract_prob_Corticospinal_Tract_L"
